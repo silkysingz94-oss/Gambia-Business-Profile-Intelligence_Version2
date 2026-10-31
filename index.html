@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#102b3f">
+<title>Gambia Business Profile Intelligence | SILKYSINGZ GEOAI</title>
+<link rel="preconnect" href="https://unpkg.com">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{--navy:#102b3f;--navy2:#173e55;--teal:#0f9d91;--teal2:#dff5f1;--gold:#e5a93d;--ink:#172b3a;--muted:#718292;--line:#e4ebef;--bg:#f3f6f8;--white:#fff;--red:#d85b5b;--green:#238b65;--shadow:0 8px 24px rgba(22,47,65,.07)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:'DM Sans',sans-serif;color:var(--ink);background:var(--bg)}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{height:100vh;min-height:680px;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:66px;flex:0 0 66px;background:var(--navy);color:white;display:flex;align-items:center;justify-content:space-between;padding:0 22px;box-shadow:0 3px 14px #102b3f25;z-index:500}
+.brand{display:flex;align-items:center;gap:12px}
+.brandmark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#20b6a6,#0b766f);display:grid;place-items:center;font-size:18px}
+.brand h1{font:800 15px Manrope;margin:0;letter-spacing:.2px}
+.brand small{display:block;color:#b9cbd5;font-size:10px;letter-spacing:1.5px;margin-top:3px}
+.topright{display:flex;align-items:center;gap:15px;font-size:11px;color:#d4e0e6}
+.live{display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;background:#4bd4a4;border-radius:50%;box-shadow:0 0 0 4px #4bd4a425}
+.toolbar{height:46px;flex:0 0 46px;background:white;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.crumb{font-size:11px;color:var(--muted)}
+.crumb b{color:var(--ink)}
+.toolbar-actions{display:flex;gap:7px}
+.btn{border:1px solid var(--line);background:white;color:var(--ink);padding:8px 11px;border-radius:7px;font-size:10px;font-weight:700}
+.btn:hover{border-color:var(--teal);color:var(--teal)}
+.btn.primary{background:var(--teal);color:white;border-color:var(--teal)}
+.btn.dark{background:var(--navy);color:white;border-color:var(--navy)}
+.btn.danger{color:var(--red)}
+.workspace{flex:1;min-height:0;display:grid;grid-template-columns:minmax(270px,.92fr) minmax(380px,1.35fr) minmax(280px,.92fr);gap:10px;padding:10px}
+.panel{background:white;border:1px solid var(--line);border-radius:11px;min-height:0;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow)}
+.panel-head{padding:14px 15px 11px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex:0 0 auto}
+.panel-head h2{font:800 12px Manrope;margin:0}
+.panel-head p{font-size:9px;color:var(--muted);margin:4px 0 0}
+.eyebrow{font-size:9px;color:var(--teal);font-weight:800;letter-spacing:1.3px;text-transform:uppercase;margin-bottom:5px}
+.scroll{overflow-y:auto;min-height:0;flex:1;padding:13px 14px;scrollbar-width:thin;scrollbar-color:#cbd6dc transparent}
+.section{margin-bottom:17px}
+.section-title{font:800 10px Manrope;text-transform:uppercase;letter-spacing:.8px;color:#526878;margin:0 0 9px;display:flex;align-items:center;gap:7px}
+.section-title i{color:var(--teal)}
+.field{margin-bottom:9px}
+.field label{display:block;font-size:9px;font-weight:700;color:#607384;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;border:1px solid #dfe7eb;border-radius:7px;padding:9px 10px;font-size:10px;color:var(--ink);outline:none;background:#fff}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px #0f9d9112}
+.field textarea{min-height:55px;resize:vertical}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.checkrow{display:flex;align-items:center;gap:7px;font-size:10px;color:#526878;margin:7px 0}
+.checkrow input{accent-color:var(--teal)}
+.add-form{background:#f8fbfc;border:1px solid var(--line);padding:11px;border-radius:9px}
+.form-actions{display:flex;gap:7px;margin-top:8px}
+.form-actions button{flex:1}
+.filter-note{font-size:9px;color:var(--muted);line-height:1.5}
+.profile-list{display:flex;flex-direction:column;gap:7px}
+.profile-item{border:1px solid var(--line);border-radius:8px;padding:9px;cursor:pointer;transition:.15s}
+.profile-item:hover,.profile-item.active{border-color:#77c9bf;background:#f2fbf9}
+.profile-top{display:flex;justify-content:space-between;gap:6px}
+.profile-name{font-size:10px;font-weight:800}
+.profile-meta{font-size:9px;color:var(--muted);margin-top:4px}
+.pill{font-size:8px;font-weight:800;border-radius:20px;padding:4px 7px;white-space:nowrap}
+.pill.good{background:#e4f5ed;color:#238b65}
+.pill.warn{background:#fff3dc;color:#a86d0b}
+.pill.bad{background:#fde9e8;color:#c14f4f}
+.pill.neutral{background:#edf2f5;color:#627583}
+.map-panel{position:relative}
+.map-head{position:absolute;top:12px;left:12px;right:12px;z-index:400;display:flex;justify-content:space-between;pointer-events:none}
+.map-label,.map-actions{background:#fff;border:1px solid #e2e9ed;border-radius:8px;box-shadow:0 4px 14px #102b3f18;padding:8px 10px;pointer-events:auto}
+.map-label strong{display:block;font:800 10px Manrope}
+.map-label span{font-size:8px;color:var(--muted)}
+.map-actions{display:flex;gap:5px}
+.map-actions button{border:0;background:#f4f7f8;border-radius:5px;padding:6px 8px;color:#536a79;font-size:9px}
+.map-actions button.active{background:var(--teal2);color:#087d73}
+.map-actions button.boundary-loading{opacity:.65;cursor:wait}
+#map{height:100%;width:100%;background:#e9eff1}
+.map-footer{position:absolute;bottom:12px;left:12px;right:12px;z-index:400;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
+.map-legend,.map-status{background:#fff;border:1px solid #e2e9ed;border-radius:8px;padding:8px 10px;box-shadow:0 4px 14px #102b3f18;font-size:8px;color:#526878;pointer-events:auto}
+.legend-item{display:inline-flex;align-items:center;gap:5px;margin-right:10px}
+.legend-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.map-status{max-width:55%;text-align:right}
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.kpi{padding:11px;border:1px solid var(--line);border-radius:9px;background:#fff}
+.kpi .label{font-size:8px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.kpi .value{font:800 22px Manrope;margin-top:5px;color:var(--navy)}
+.kpi .sub{font-size:8px;color:var(--muted);margin-top:3px}
+.progress-wrap{margin:8px 0}
+.progress-head{display:flex;justify-content:space-between;font-size:9px;margin-bottom:5px;color:#5d7180}
+.progress{height:7px;background:#edf2f4;border-radius:10px;overflow:hidden}
+.progress span{height:100%;display:block;border-radius:10px;background:var(--teal)}
+.audit-card{border:1px solid var(--line);border-radius:9px;padding:11px;margin-bottom:9px}
+.audit-card h3{font:800 10px Manrope;margin:0 0 8px}
+.audit-line{display:flex;justify-content:space-between;gap:8px;padding:6px 0;border-top:1px solid #f0f3f5;font-size:9px}
+.audit-line:first-of-type{border-top:0}
+.audit-line span:first-child{color:#607384}
+.audit-line b{font-size:9px;text-align:right}
+.recommendation{background:#f0faf8;border-left:3px solid var(--teal);padding:10px;border-radius:5px;font-size:9px;line-height:1.6;color:#45636b}
+.chartbar{display:flex;align-items:center;gap:8px;margin:9px 0}
+.chartbar label{width:72px;font-size:9px;color:#617483;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chartbar .track{height:8px;background:#edf2f4;border-radius:8px;flex:1;overflow:hidden}
+.chartbar .track span{height:100%;display:block;background:linear-gradient(90deg,#0f9d91,#62c7b7);border-radius:8px}
+.chartbar b{font-size:9px;width:23px;text-align:right}
+.empty{padding:17px;text-align:center;color:#8a9aa5;font-size:9px;line-height:1.6;border:1px dashed #dbe4e8;border-radius:8px}
+.footer{height:25px;flex:0 0 25px;display:flex;align-items:center;justify-content:space-between;padding:0 17px;color:#8b9aa4;font-size:8px}
+.modal-backdrop{position:fixed;inset:0;background:#102b3f77;z-index:1000;display:none;align-items:center;justify-content:center;padding:15px}
+.modal-backdrop.show{display:flex}
+.modal{width:min(560px,100%);max-height:90vh;overflow:auto;background:white;border-radius:13px;box-shadow:0 20px 60px #102b3f40}
+.modal-head{padding:15px 17px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.modal-head h3{font:800 13px Manrope;margin:0}
+.modal-body{padding:16px}
+.modal-foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:7px}
+.toast{position:fixed;bottom:35px;left:50%;transform:translateX(-50%);background:var(--navy);color:white;padding:10px 15px;border-radius:8px;font-size:10px;z-index:1500;box-shadow:var(--shadow);display:none}
+.toast.show{display:block}
+.leaflet-popup-content-wrapper{border-radius:9px}
+.popup-title{font:800 11px Manrope;margin-bottom:4px}
+.popup-small{font-size:9px;color:#657987;line-height:1.5}
+.popup-btn{margin-top:7px;background:var(--teal);color:white;border:0;border-radius:5px;padding:6px 8px;font-size:9px}
+
+@media(max-width:1050px){
+ .workspace{grid-template-columns:minmax(245px,.9fr) minmax(320px,1.2fr)}
+ .right-panel{grid-column:1/-1;min-height:330px}
+ .app{height:auto;min-height:100vh;overflow:visible}
+ .workspace{height:auto;grid-template-rows:610px 520px}
+ .panel{min-height:0}
+ .map-panel{grid-column:2;grid-row:1}
+ .left-panel{grid-column:1;grid-row:1}
+ .right-panel{grid-row:2}
+ .footer{margin-top:5px}
+}
+@media(max-width:700px){
+ .topbar{padding:0 12px}
+ .topright{display:none}
+ .toolbar{padding:0 12px}
+ .workspace{display:flex;flex-direction:column;padding:8px}
+ .left-panel{height:560px}
+ .map-panel{height:500px;order:-1}
+ .right-panel{height:570px}
+ .footer{font-size:7px}
+ .map-footer{flex-direction:column;align-items:flex-start}
+ .map-status{max-width:100%;text-align:left}
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header class="topbar">
+ <div class="brand">
+  <div class="brandmark"><i class="fa-solid fa-location-dot"></i></div>
+  <div>
+   <h1>GAMBIA BUSINESS PROFILE INTELLIGENCE</h1>
+   <small>SILKYSINGZ GEOAI • LOCAL DIGITAL PRESENCE</small>
+  </div>
+ </div>
+ <div class="topright">
+  <span class="live"><i class="dot"></i> LOCAL WORKSPACE</span>
+  <span>THE GAMBIA</span>
+  <span><i class="fa-solid fa-globe"></i> 13.45°N · 16.58°W</span>
+ </div>
+</header>
+
+<div class="toolbar">
+ <div class="crumb">GBoS GEOAI / <b>Business Visibility & Profile Audit</b></div>
+ <div class="toolbar-actions">
+  <button class="btn" id="importBtn"><i class="fa-solid fa-file-import"></i> Import CSV</button>
+  <button class="btn" id="exportBtn"><i class="fa-solid fa-file-export"></i> Export CSV</button>
+  <button class="btn primary" id="addTopBtn"><i class="fa-solid fa-plus"></i> Add business</button>
+  <input type="file" id="csvFile" accept=".csv,text/csv" hidden>
+ </div>
+</div>
+
+<main class="workspace">
+
+<section class="panel left-panel">
+ <div class="panel-head">
+  <div>
+   <div class="eyebrow">Directory & controls</div>
+   <h2>Business Profiles</h2>
+   <p>Build and manage a local profile-audit register</p>
+  </div>
+  <i class="fa-solid fa-store" style="color:var(--teal)"></i>
+ </div>
+
+ <div class="scroll">
+  <div class="section">
+   <h3 class="section-title"><i class="fa-solid fa-filter"></i> Search & filter</h3>
+   <div class="field"><input id="searchInput" placeholder="Search business, town or category..."></div>
+   <div class="field-row">
+    <div class="field">
+     <label>REGION / LGA</label>
+     <select id="regionFilter"><option value="">All areas</option></select>
+    </div>
+    <div class="field">
+     <label>CATEGORY</label>
+     <select id="categoryFilter"><option value="">All categories</option></select>
+    </div>
+   </div>
+   <div class="field">
+    <label>AUDIT STATUS</label>
+    <select id="statusFilter">
+     <option value="">All statuses</option>
+     <option>Needs attention</option>
+     <option>Partially checked</option>
+     <option>Up to date</option>
+     <option>Not audited</option>
+    </select>
+   </div>
+   <p class="filter-note">The directory is a user-managed audit register. It does not automatically access or verify Google Business Profiles.</p>
+  </div>
+
+  <div class="section">
+   <h3 class="section-title"><i class="fa-solid fa-address-card"></i> Business register <span id="recordCount" style="margin-left:auto;color:var(--muted)">0 records</span></h3>
+   <div class="profile-list" id="profileList">
+    <div class="empty">No businesses added yet.<br>Use “Add business” to create your first record, or load the illustrative demo dataset.</div>
+   </div>
+  </div>
+
+  <div class="section add-form" id="addForm">
+   <h3 class="section-title"><i class="fa-solid fa-circle-plus"></i> Add a business</h3>
+   <div class="field">
+    <label>BUSINESS NAME *</label>
+    <input id="bizName" placeholder="e.g. Example Restaurant">
+   </div>
+   <div class="field-row">
+    <div class="field">
+     <label>CATEGORY</label>
+     <select id="bizCategory">
+      <option>Restaurant</option>
+      <option>Hotel / Guesthouse</option>
+      <option>Retail / Supermarket</option>
+      <option>Pharmacy / Health</option>
+      <option>Tourism / Leisure</option>
+      <option>Professional service</option>
+      <option>Other</option>
+     </select>
+    </div>
+    <div class="field">
+     <label>TOWN / AREA</label>
+     <input id="bizTown" placeholder="e.g. Kololi">
+    </div>
+   </div>
+   <div class="field-row">
+    <div class="field">
+     <label>REGION / LGA</label>
+     <select id="bizRegion">
+      <option value="">Select area</option>
+      <option>Banjul</option>
+      <option>Kanifing</option>
+      <option>Brikama</option>
+      <option>Farafenni</option>
+      <option>Janjanbureh</option>
+      <option>Basse</option>
+      <option>Kerewan</option>
+      <option>Other</option>
+     </select>
+    </div>
+    <div class="field">
+     <label>PHONE</label>
+     <input id="bizPhone" placeholder="+220 ...">
+    </div>
+   </div>
+   <div class="field">
+    <label>GOOGLE PROFILE URL (OPTIONAL)</label>
+    <input id="bizUrl" placeholder="https://maps.google.com/...">
+   </div>
+   <div class="field-row">
+    <div class="field">
+     <label>LATITUDE</label>
+     <input id="bizLat" type="number" step="any" placeholder="13.45">
+    </div>
+    <div class="field">
+     <label>LONGITUDE</label>
+     <input id="bizLon" type="number" step="any" placeholder="-16.58">
+    </div>
+   </div>
+   <div class="form-actions">
+    <button class="btn primary" id="saveBizBtn"><i class="fa-solid fa-plus"></i> Save business</button>
+    <button class="btn" id="clearFormBtn">Clear</button>
+   </div>
+  </div>
+
+  <div class="section">
+   <h3 class="section-title"><i class="fa-solid fa-lightbulb"></i> Getting started</h3>
+   <button class="btn" id="demoBtn" style="width:100%">
+    <i class="fa-solid fa-flask"></i> Load illustrative demo records
+   </button>
+   <p class="filter-note" style="margin-top:7px">Demo entries are fictional examples for testing the interface; they are not verified Gambian businesses.</p>
+  </div>
+ </div>
+</section>
+
+<section class="panel map-panel">
+ <div id="map"></div>
+ <div class="map-head">
+  <div class="map-label">
+   <strong><i class="fa-solid fa-map-location-dot" style="color:var(--teal)"></i> Business location explorer</strong>
+   <span>Map view of registered audit records</span>
+  </div>
+  <div class="map-actions">
+   <button id="streetBtn" class="active">Street</button>
+   <button id="satBtn">Satellite</button>
+   <button id="boundaryBtn" class="active" title="Show or hide administrative boundary">
+    <i class="fa-solid fa-draw-polygon"></i> Boundary
+   </button>
+   <button id="fitBtn" title="Zoom to records"><i class="fa-solid fa-expand"></i></button>
+  </div>
+ </div>
+ <div class="map-footer">
+  <div class="map-legend">
+   <span class="legend-item"><i class="legend-dot" style="background:#238b65"></i> Up to date</span>
+   <span class="legend-item"><i class="legend-dot" style="background:#e5a93d"></i> Partial</span>
+   <span class="legend-item"><i class="legend-dot" style="background:#d85b5b"></i> Attention</span>
+   <span class="legend-item"><i class="legend-dot" style="background:#8b9aa4"></i> Not audited</span>
+  </div>
+  <div class="map-status" id="mapStatus">Ready · Add or select a business to explore its location</div>
+ </div>
+</section>
+
+<section class="panel right-panel">
+ <div class="panel-head">
+  <div>
+   <div class="eyebrow">Monitoring & insights</div>
+   <h2>Digital Presence Analytics</h2>
+   <p>Completeness, audit progress and recommended actions</p>
+  </div>
+  <i class="fa-solid fa-chart-line" style="color:var(--teal)"></i>
+ </div>
+
+ <div class="scroll">
+  <div class="section">
+   <h3 class="section-title"><i class="fa-solid fa-gauge-high"></i> Overview indicators</h3>
+   <div class="kpi-grid">
+    <div class="kpi">
+     <div class="label">Registered profiles</div>
+     <div class="value" id="kpiTotal">0</div>
+     <div class="sub">Businesses in this register</div>
+    </div>
+    <div class="kpi">
+     <div class="label">Up to date</div>
+     <div class="value" id="kpiGood">0</div>
+     <div class="sub">All checks completed</div>
+    </div>
+    <div class="kpi">
+     <div class="label">Need attention</div>
+     <div class="value" id="kpiBad">0</div>
+     <div class="sub">One or more issues found</div>
+    </div>
+    <div class="kpi">
+     <div class="label">Audit completion</div>
+     <div class="value" id="kpiCompletion">0%</div>
+     <div class="sub">Checklist items completed</div>
+    </div>
+   </div>
+  </div>
+
+  <div class="section">
+   <h3 class="section-title"><i class="fa-solid fa-chart-simple"></i> Audit checklist completion</h3>
+   <div id="checkProgress"></div>
+  </div>
+
+  <div class="section">
+   <h3 class="section-title"><i class="fa-solid fa-layer-group"></i> Records by category</h3>
+   <div id="categoryChart"><div class="empty">Add records to view category distribution.</div></div>
+  </div>
+
+  <div class="section">
+   <h3 class="section-title"><i class="fa-solid fa-clipboard-check"></i> Selected business audit</h3>
+   <div id="auditDetail"><div class="empty">Select a business from the directory or map to inspect its audit checklist.</div></div>
+  </div>
+
+  <div class="section">
+   <h3 class="section-title"><i class="fa-solid fa-list-check"></i> Monthly 10-minute review</h3>
+   <div class="audit-card">
+    <h3>Google Business Profile quality checks</h3>
+    <div class="checkrow"><input type="checkbox" class="global-check"> Business name and category are correct</div>
+    <div class="checkrow"><input type="checkbox" class="global-check"> Telephone number connects to the business</div>
+    <div class="checkrow"><input type="checkbox" class="global-check"> Website and social links are current</div>
+    <div class="checkrow"><input type="checkbox" class="global-check"> WhatsApp / Messenger links open correctly</div>
+    <div class="checkrow"><input type="checkbox" class="global-check"> Opening hours and holiday hours are accurate</div>
+    <div class="checkrow"><input type="checkbox" class="global-check"> Map pin and directions are correct</div>
+    <div class="checkrow"><input type="checkbox" class="global-check"> Menu, services, photos and ordering links are current</div>
+    <div class="checkrow"><input type="checkbox" class="global-check"> Reviews and customer questions are monitored</div>
+    <button class="btn" id="resetMonthly" style="width:100%;margin-top:8px">Reset monthly checklist</button>
+   </div>
+  </div>
+
+  <div class="section">
+   <h3 class="section-title"><i class="fa-solid fa-shield-halved"></i> Data & methodology</h3>
+   <div class="recommendation">
+    <b>Important limitation:</b> This is an independent planning and audit dashboard. It does not connect to Google Business Profile, does not scrape Google Maps, and cannot confirm that a business listing exists or that a link works. Checks must be completed manually by the business owner or authorised auditor. A production integration would require approved Google APIs, OAuth consent and appropriate permissions.
+   </div>
+   <p class="filter-note" style="margin-top:8px">Suggested routine: review profiles monthly, after a change of telephone number, website, opening hours, ownership or service provider, and before major tourism or promotional periods.</p>
+  </div>
+ </div>
+</section>
+
+</main>
+
+<footer class="footer">
+ <span>Produced by Ansu Singhateh · GIS Analyst · GIS / Cartography Unit · GBoS</span>
+ <span>GBoS GEOAI • SILKYSINGZ GEOAI · Research & educational use · Boundary: geoBoundaries</span>
+</footer>
+</div>
+
+<div class="modal-backdrop" id="auditModal">
+ <div class="modal">
+  <div class="modal-head">
+   <h3 id="modalTitle">Business profile audit</h3>
+   <button class="btn" id="closeModal">✕</button>
+  </div>
+  <div class="modal-body" id="modalBody"></div>
+  <div class="modal-foot">
+   <button class="btn" id="deleteBizBtn" style="margin-right:auto;color:var(--red)">Delete record</button>
+   <button class="btn" id="cancelAuditBtn">Cancel</button>
+   <button class="btn primary" id="saveAuditBtn">Save audit</button>
+  </div>
+ </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+(() => {
+'use strict';
+
+const STORAGE_KEY='gambia_business_profile_intelligence_v1';
+
+const AREAS={
+ 'Banjul':[13.4549,-16.5790],
+ 'Kanifing':[13.4383,-16.6780],
+ 'Brikama':[13.2714,-16.6494],
+ 'Farafenni':[13.5667,-15.6000],
+ 'Janjanbureh':[13.5333,-14.7667],
+ 'Basse':[13.3099,-14.2130],
+ 'Kerewan':[13.4898,-16.0880],
+ 'Other':[13.4549,-16.5790]
+};
+
+const CHECKS=[
+ ['phone','Telephone number connects correctly'],
+ ['website','Website opens and shows current information'],
+ ['social','Facebook / Instagram / other social links are correct'],
+ ['messaging','WhatsApp or Messenger opens the intended account'],
+ ['hours','Opening hours and holiday hours are accurate'],
+ ['location','Map pin and directions point to the correct premises'],
+ ['services','Products, menu and services are current'],
+ ['ordering','Ordering / booking providers are correct or removed if unwanted'],
+ ['photos','Photos and business description are current'],
+ ['reviews','Reviews and customer questions are monitored']
+];
+
+let records=[],selectedId=null,editingId=null,map,markers=[],streetLayer,satLayer,activeLayer;
+let boundaryLayer=null,boundaryVisible=true,boundaryLoaded=false;
+
+const BOUNDARY_API='https://www.geoboundaries.org/api/current/gbOpen/GMB/ADM0/';
+
+const $=id=>document.getElementById(id);
+
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({
+ '&':'&amp;',
+ '<':'&lt;',
+ '>':'&gt;',
+ '"':'&quot;',
+ "'":'&#39;'
+}[c]));
+
+const uid=()=> 'biz_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7);
+
+function toast(msg){
+ const t=$('toast');
+ t.textContent=msg;
+ t.classList.add('show');
+ setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+function save(){
+ try{
+  localStorage.setItem(STORAGE_KEY,JSON.stringify(records));
+ }catch(e){
+  toast('Browser storage unavailable. Export your records for backup.');
+ }
+}
+
+function load(){
+ try{
+  records=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
+  if(!Array.isArray(records))records=[];
+ }catch(e){
+  records=[];
+ }
+}
+
+function coords(r){
+ let lat=Number(r.lat),lon=Number(r.lon);
+ if(Number.isFinite(lat)&&Number.isFinite(lon)&&lat>=13.0&&lat<=13.9&&lon>=-16.9&&lon<=-13.7)return [lat,lon];
+ return AREAS[r.region]||AREAS.Other;
+}
+
+function status(r){
+ const done=CHECKS.filter(c=>r.checks&&r.checks[c[0]]).length;
+ if(done===0)return 'Not audited';
+ if(done===CHECKS.length)return 'Up to date';
+ if(done>=1)return 'Partially checked';
+ return 'Not audited';
+}
+
+function statusClass(s){
+ return s==='Up to date'?'good':s==='Partially checked'?'warn':s==='Needs attention'?'bad':'neutral';
+}
+
+function issueCount(r){
+ return CHECKS.filter(c=>!(r.checks&&r.checks[c[0]])).length;
+}
+
+/* =========================================================
+   THE GAMBIA BOUNDARY LOADER
+   1. geoBoundaries current ADM0
+   2. GitHub-hosted Natural Earth country GeoJSON
+   Transparent fill with teal outline
+========================================================= */
+
+async function loadGambiaBoundary(){
+
+ const btn=$('boundaryBtn');
+ const status=$('mapStatus');
+
+ const fallbackUrl=
+  'https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geojson';
+
+ if(btn){
+  btn.disabled=true;
+  btn.classList.add('boundary-loading');
+  btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Loading';
+ }
+
+ status.textContent='Loading The Gambia national boundary…';
+
+ async function getJSON(url){
+
+  const response=await fetch(url,{
+   mode:'cors',
+   cache:'no-cache'
+  });
+
+  if(!response.ok){
+   throw new Error('HTTP '+response.status+' while requesting '+url);
+  }
+
+  return await response.json();
+ }
+
+ function renderBoundary(geojson,sourceName){
+
+  if(boundaryLayer){
+   map.removeLayer(boundaryLayer);
+  }
+
+  boundaryLayer=L.geoJSON(geojson,{
+
+   style:()=>({
+    color:'#0f9d91',
+    weight:2.5,
+    opacity:1,
+    fill:false,
+    fillOpacity:0,
+    dashArray:'6 4'
+   }),
+
+   interactive:true,
+
+   onEachFeature:(feature,layer)=>{
+
+    const props=feature.properties||{};
+
+    const name=
+     props.shapeName||
+     props.NAME_0||
+     props.name||
+     props.ADMIN||
+     'The Gambia';
+
+    layer.bindTooltip(esc(name),{
+     sticky:true,
+     direction:'auto'
+    });
+   }
+
+  });
+
+  if(boundaryVisible){
+   boundaryLayer.addTo(map);
+  }
+
+  boundaryLoaded=true;
+
+  const bounds=boundaryLayer.getBounds();
+
+  if(bounds.isValid()){
+   map.fitBounds(bounds,{padding:[24,24]});
+  }
+
+  status.textContent=
+   'The Gambia boundary loaded · Transparent fill · Source: '+sourceName;
+
+  if(btn){
+   btn.disabled=false;
+   btn.classList.remove('boundary-loading');
+   btn.classList.toggle('active',boundaryVisible);
+   btn.innerHTML='<i class="fa-solid fa-draw-polygon"></i> Boundary';
+  }
+ }
+
+ try{
+
+  /* SOURCE 1: geoBoundaries */
+
+  try{
+
+   const metadata=await getJSON(BOUNDARY_API);
+
+   const geojsonUrl=
+    metadata.gjDownloadURL||
+    metadata.simplifiedGeometryGeoJSON||
+    metadata.gjDownloadURLSimplified;
+
+   if(!geojsonUrl){
+    throw new Error('geoBoundaries metadata did not contain a GeoJSON URL');
+   }
+
+   const geojson=await getJSON(geojsonUrl);
+
+   if(!geojson.features||!Array.isArray(geojson.features)){
+    throw new Error('geoBoundaries response is not a GeoJSON FeatureCollection');
+   }
+
+   renderBoundary(geojson,'geoBoundaries');
+   return;
+
+  }catch(error){
+
+   console.warn('geoBoundaries current source failed:',error);
+  }
+
+  /* SOURCE 2: GITHUB NATURAL EARTH COUNTRY BOUNDARIES */
+
+  try{
+
+   const world=await getJSON(fallbackUrl);
+
+   if(!world.features||!Array.isArray(world.features)){
+    throw new Error('Fallback response is not a GeoJSON FeatureCollection');
+   }
+
+   const features=world.features.filter(feature=>{
+
+    const p=feature.properties||{};
+
+    const values=[
+     p['ISO3166-1-Alpha-3'],
+     p.ISO_A3,
+     p.iso_a3,
+     p.ADM0_A3,
+     p.ADMIN,
+     p.name,
+     p.NAME,
+     p.name_long,
+     p.SOVEREIGNT
+    ].map(v=>String(v||'').trim().toLowerCase());
+
+    return values.includes('gmb')||
+           values.includes('gambia')||
+           values.includes('the gambia');
+   });
+
+   if(!features.length){
+    throw new Error('Gambia feature not found in fallback GeoJSON');
+   }
+
+   renderBoundary(
+    {type:'FeatureCollection',features},
+    'GitHub Natural Earth country boundaries'
+   );
+
+   return;
+
+  }catch(error){
+
+   console.error('GitHub fallback source failed:',error);
+  }
+
+  throw new Error('All boundary data sources failed');
+
+ }catch(error){
+
+  console.error('Boundary loading failed:',error);
+
+  status.textContent=
+   'Boundary unavailable. Check your internet connection, then click Boundary to retry.';
+
+  if(btn){
+   btn.disabled=false;
+   btn.classList.remove('boundary-loading','active');
+   btn.innerHTML='<i class="fa-solid fa-rotate"></i> Retry boundary';
+  }
+
+ }finally{
+
+  if(btn){
+   btn.disabled=false;
+   btn.classList.remove('boundary-loading');
+  }
+ }
+}
+
+function toggleBoundary(){
+
+ // If no boundary has loaded, clicking the button retries the download.
+ if(!boundaryLoaded){
+  loadGambiaBoundary();
+  return;
+ }
+
+ boundaryVisible=!boundaryVisible;
+
+ const btn=$('boundaryBtn');
+
+ if(boundaryLayer){
+
+  if(boundaryVisible){
+   boundaryLayer.addTo(map);
+   btn.classList.add('active');
+  }else{
+   map.removeLayer(boundaryLayer);
+   btn.classList.remove('active');
+  }
+ }
+
+ if(boundaryLoaded){
+  $('mapStatus').textContent=boundaryVisible
+   ?'The Gambia boundary visible · Transparent fill'
+   :'The Gambia boundary hidden';
+ }
+}
+
+function initMap(){
+
+ map=L.map('map',{
+  zoomControl:true,
+  preferCanvas:true
+ }).setView([13.42,-15.65],8);
+
+ streetLayer=L.tileLayer(
+  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+  {
+   maxZoom:19,
+   attribution:'© OpenStreetMap contributors'
+  }
+ );
+
+ satLayer=L.tileLayer(
+  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  {
+   maxZoom:19,
+   attribution:'Tiles © Esri'
+  }
+ );
+
+ activeLayer=streetLayer.addTo(map);
+}
+
+function markerColor(r){
+
+ const s=status(r);
+
+ return s==='Up to date'?'#238b65':
+        s==='Partially checked'?'#e5a93d':
+        s==='Needs attention'?'#d85b5b':
+        '#8b9aa4';
+}
+
+function refreshMap(){
+
+ markers.forEach(m=>map.removeLayer(m));
+ markers=[];
+
+ records.forEach(r=>{
+
+  const p=coords(r);
+  const color=markerColor(r);
+
+  const m=L.circleMarker(p,{
+   radius:r.id===selectedId?10:7,
+   fillColor:color,
+   color:'#fff',
+   weight:2,
+   fillOpacity:.95
+  }).addTo(map);
+
+  m.bindPopup(`
+   <div class="popup-title">${esc(r.name)}</div>
+   <div class="popup-small">
+    ${esc(r.category)} · ${esc(r.town||r.region||'The Gambia')}
+    <br>Status: ${esc(status(r))}
+    <br>Audit items outstanding: ${issueCount(r)}
+   </div>
+   <button class="popup-btn" onclick="window.selectBusiness('${r.id}')">Open audit</button>
+  `);
+
+  m.on('click',()=>selectBusiness(r.id));
+
+  markers.push(m);
+ });
+
+ $('mapStatus').textContent=records.length
+  ?`${records.length} registered record(s) · Marker position uses supplied coordinates or approximate town centre`
+  :'Ready · Add or select a business to explore its location';
+}
+
+function refreshFilters(){
+
+ const regions=[...new Set(records.map(r=>r.region).filter(Boolean))].sort();
+ const cats=[...new Set(records.map(r=>r.category).filter(Boolean))].sort();
+
+ const oldR=$('regionFilter').value;
+ const oldC=$('categoryFilter').value;
+
+ $('regionFilter').innerHTML=
+  '<option value="">All areas</option>'+
+  regions.map(x=>`<option>${esc(x)}</option>`).join('');
+
+ $('categoryFilter').innerHTML=
+  '<option value="">All categories</option>'+
+  cats.map(x=>`<option>${esc(x)}</option>`).join('');
+
+ $('regionFilter').value=regions.includes(oldR)?oldR:'';
+ $('categoryFilter').value=cats.includes(oldC)?oldC:'';
+}
+
+function filtered(){
+
+ const q=$('searchInput').value.toLowerCase().trim();
+ const reg=$('regionFilter').value;
+ const cat=$('categoryFilter').value;
+ const st=$('statusFilter').value;
+
+ return records.filter(r=>
+  (!q||[r.name,r.town,r.category,r.region].join(' ').toLowerCase().includes(q))&&
+  (!reg||r.region===reg)&&
+  (!cat||r.category===cat)&&
+  (!st||status(r)===st)
+ );
+}
+
+function renderList(){
+
+ const rows=filtered();
+
+ $('recordCount').textContent=`${rows.length} / ${records.length} records`;
+
+ $('profileList').innerHTML=rows.length
+  ?rows.map(r=>{
+    const s=status(r);
+
+    return `
+     <div class="profile-item ${r.id===selectedId?'active':''}" data-id="${esc(r.id)}">
+      <div class="profile-top">
+       <div class="profile-name">${esc(r.name)}</div>
+       <span class="pill ${statusClass(s)}">${esc(s)}</span>
+      </div>
+      <div class="profile-meta">${esc(r.category)} · ${esc(r.town||r.region||'Area not set')}</div>
+      <div class="profile-meta">${CHECKS.filter(c=>r.checks&&r.checks[c[0]]).length}/${CHECKS.length} checks completed</div>
+     </div>
+    `;
+   }).join('')
+  :'<div class="empty">No matching businesses. Change the filters or add a record.</div>';
+
+ document.querySelectorAll('.profile-item').forEach(el=>{
+  el.addEventListener('click',()=>selectBusiness(el.dataset.id));
+ });
+}
+
+function renderAnalytics(){
+
+ const total=records.length;
+ const good=records.filter(r=>status(r)==='Up to date').length;
+ const bad=records.filter(r=>status(r)==='Needs attention').length;
+
+ const done=records.reduce(
+  (a,r)=>a+CHECKS.filter(c=>r.checks&&r.checks[c[0]]).length,
+  0
+ );
+
+ const possible=total*CHECKS.length;
+ const pct=possible?Math.round(done/possible*100):0;
+
+ $('kpiTotal').textContent=total;
+ $('kpiGood').textContent=good;
+ $('kpiBad').textContent=bad;
+ $('kpiCompletion').textContent=pct+'%';
+
+ $('checkProgress').innerHTML=CHECKS.map(c=>{
+
+  const n=records.filter(r=>r.checks&&r.checks[c[0]]).length;
+  const p=total?Math.round(n/total*100):0;
+
+  return `
+   <div class="progress-wrap">
+    <div class="progress-head">
+     <span>${esc(c[1])}</span>
+     <b>${n}/${total}</b>
+    </div>
+    <div class="progress">
+     <span style="width:${p}%"></span>
+    </div>
+   </div>
+  `;
+ }).join('');
+
+ const cats={};
+
+ records.forEach(r=>{
+  cats[r.category||'Other']=(cats[r.category||'Other']||0)+1;
+ });
+
+ const max=Math.max(1,...Object.values(cats));
+
+ $('categoryChart').innerHTML=Object.keys(cats).length
+  ?Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
+    <div class="chartbar">
+     <label title="${esc(k)}">${esc(k)}</label>
+     <div class="track"><span style="width:${v/max*100}%"></span></div>
+     <b>${v}</b>
+    </div>
+   `).join('')
+  :'<div class="empty">Add records to view category distribution.</div>';
+
+ renderSelectedAudit();
+}
+
+function renderSelectedAudit(){
+
+ const r=records.find(x=>x.id===selectedId);
+
+ if(!r){
+  $('auditDetail').innerHTML=
+   '<div class="empty">Select a business from the directory or map to inspect its audit checklist.</div>';
+  return;
+ }
+
+ const s=status(r);
+ const done=CHECKS.length-issueCount(r);
+
+ $('auditDetail').innerHTML=`
+  <div class="audit-card">
+   <h3>${esc(r.name)}</h3>
+   <div class="audit-line">
+    <span>Category / area</span>
+    <b>${esc(r.category)} · ${esc(r.town||r.region||'Not set')}</b>
+   </div>
+   <div class="audit-line">
+    <span>Audit status</span>
+    <b><span class="pill ${statusClass(s)}">${esc(s)}</span></b>
+   </div>
+   <div class="audit-line">
+    <span>Completed checks</span>
+    <b>${done} of ${CHECKS.length}</b>
+   </div>
+   <div class="audit-line">
+    <span>Outstanding checks</span>
+    <b>${issueCount(r)}</b>
+   </div>
+   <button class="btn primary" style="width:100%;margin-top:9px" id="openAuditFromDetail">
+    <i class="fa-solid fa-clipboard-check"></i> Open checklist
+   </button>
+  </div>
+  <div class="recommendation">
+   ${issueCount(r)===0
+    ?'All listed audit checks have been marked complete. Continue the monthly review.'
+    :`Review the ${issueCount(r)} outstanding checklist item(s). Confirm each link or detail directly on the live business profile before marking it complete.`}
+  </div>
+ `;
+
+ $('openAuditFromDetail').onclick=()=>openAudit(r.id);
+}
+
+function render(){
+ refreshFilters();
+ renderList();
+ renderAnalytics();
+ refreshMap();
+}
+
+function selectBusiness(id){
+
+ selectedId=id;
+
+ renderList();
+ renderSelectedAudit();
+
+ const r=records.find(x=>x.id===id);
+
+ if(r){
+  const p=coords(r);
+  map.setView(p,Math.max(map.getZoom(),13));
+
+  const idx=records.findIndex(x=>x.id===id);
+
+  if(markers[idx])markers[idx].openPopup();
+ }
+}
+
+window.selectBusiness=selectBusiness;
+
+function clearForm(){
+
+ ['bizName','bizTown','bizPhone','bizUrl','bizLat','bizLon'].forEach(id=>{
+  $(id).value='';
+ });
+
+ $('bizCategory').value='Restaurant';
+ $('bizRegion').value='';
+}
+
+function addBusiness(){
+
+ const name=$('bizName').value.trim();
+
+ if(!name){
+  toast('Enter a business name first.');
+  $('bizName').focus();
+  return;
+ }
+
+ const region=$('bizRegion').value||'Other';
+
+ const r={
+  id:uid(),
+  name,
+  category:$('bizCategory').value,
+  town:$('bizTown').value.trim(),
+  region,
+  phone:$('bizPhone').value.trim(),
+  url:$('bizUrl').value.trim(),
+  lat:$('bizLat').value,
+  lon:$('bizLon').value,
+  checks:{}
+ };
+
+ records.push(r);
+ selectedId=r.id;
+
+ save();
+ clearForm();
+ render();
+ selectBusiness(r.id);
+
+ toast('Business record added.');
+}
+
+function openAudit(id){
+
+ const r=records.find(x=>x.id===id);
+
+ if(!r)return;
+
+ editingId=id;
+
+ $('modalTitle').textContent='Audit checklist · '+r.name;
+
+ $('modalBody').innerHTML=`
+  <p style="font-size:10px;color:#637786;line-height:1.5;margin-top:0">
+   Open the business profile on Google Search or Maps, test each item, then tick only what you have personally verified.
+  </p>
+ `+
+ CHECKS.map(c=>`
+  <label class="checkrow" style="padding:8px 0;border-bottom:1px solid #f0f3f5">
+   <input type="checkbox" data-check="${c[0]}" ${r.checks&&r.checks[c[0]]?'checked':''}>
+   <span>${esc(c[1])}</span>
+  </label>
+ `).join('')+
+ `
+  <div class="field" style="margin-top:12px">
+   <label>LAST REVIEWED</label>
+   <input id="auditDate" type="date" value="${esc(r.reviewed||new Date().toISOString().slice(0,10))}">
+  </div>
+  <div class="field">
+   <label>AUDIT NOTES</label>
+   <textarea id="auditNotes" placeholder="Record broken links, incorrect details or follow-up actions...">${esc(r.notes||'')}</textarea>
+  </div>
+ `;
+
+ $('auditModal').classList.add('show');
+}
+
+function closeAudit(){
+ $('auditModal').classList.remove('show');
+ editingId=null;
+}
+
+function saveAudit(){
+
+ const r=records.find(x=>x.id===editingId);
+
+ if(!r)return;
+
+ r.checks={};
+
+ document.querySelectorAll('#modalBody [data-check]').forEach(el=>{
+  r.checks[el.dataset.check]=el.checked;
+ });
+
+ r.reviewed=$('auditDate').value;
+ r.notes=$('auditNotes').value.trim();
+
+ if(CHECKS.some(c=>!r.checks[c[0]])){
+  r.auditFlag='Needs attention';
+ }else{
+  r.auditFlag='';
+ }
+
+ save();
+ closeAudit();
+ render();
+ selectBusiness(r.id);
+
+ toast('Audit checklist saved.');
+}
+
+function deleteSelected(){
+
+ if(!editingId)return;
+
+ const r=records.find(x=>x.id===editingId);
+
+ if(!confirm(`Delete "${r.name}" from this browser's register?`))return;
+
+ records=records.filter(x=>x.id!==editingId);
+ selectedId=null;
+
+ save();
+ closeAudit();
+ render();
+
+ toast('Record deleted.');
+}
+
+function csvEscape(v){
+ return '"'+String(v??'').replace(/"/g,'""')+'"';
+}
+
+function exportCSV(){
+
+ const cols=[
+  'name','category','town','region','phone','url','lat','lon',
+  'status','reviewed','notes',
+  ...CHECKS.map(c=>c[0])
+ ];
+
+ const lines=[cols.join(',')];
+
+ records.forEach(r=>{
+  lines.push(
+   cols.map(k=>
+    csvEscape(
+     k==='status'
+      ?status(r)
+      :CHECKS.some(c=>c[0]===k)
+       ?!!(r.checks&&r.checks[k])
+       :r[k]
+    )
+   ).join(',')
+  );
+ });
+
+ download(
+  lines.join('\n'),
+  'gambia_business_profile_audit.csv',
+  'text/csv'
+ );
+
+ toast('CSV export prepared.');
+}
+
+function download(content,name,type){
+
+ const blob=new Blob([content],{type});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');
+
+ a.href=url;
+ a.download=name;
+ a.click();
+
+ URL.revokeObjectURL(url);
+}
+
+function parseCSV(text){
+
+ const rows=[];
+ let row=[],field='',quoted=false;
+
+ for(let i=0;i<text.length;i++){
+
+  const c=text[i],n=text[i+1];
+
+  if(quoted){
+
+   if(c==='"'&&n==='"'){
+    field+='"';
+    i++;
+   }else if(c==='"'){
+    quoted=false;
+   }else{
+    field+=c;
+   }
+
+  }else{
+
+   if(c==='"'){
+    quoted=true;
+   }else if(c===','){
+    row.push(field);
+    field='';
+   }else if(c==='\n'){
+    row.push(field);
+    rows.push(row);
+    row=[];
+    field='';
+   }else if(c!=='\r'){
+    field+=c;
+   }
+  }
+ }
+
+ if(field.length||row.length){
+  row.push(field);
+  rows.push(row);
+ }
+
+ return rows;
+}
+
+function importCSV(file){
+
+ const reader=new FileReader();
+
+ reader.onload=()=>{
+
+  try{
+
+   const rows=parseCSV(reader.result);
+   const headers=rows.shift().map(x=>x.trim().toLowerCase());
+   const idx=k=>headers.indexOf(k);
+
+   let added=0;
+
+   rows.filter(r=>r.some(v=>v.trim())).forEach(row=>{
+
+    const get=k=>idx(k)>=0?row[idx(k)]||'':'';
+    const name=get('name')||get('business');
+
+    if(!name)return;
+
+    const checks={};
+
+    CHECKS.forEach(c=>{
+     checks[c[0]]=['true','1','yes','y'].includes(get(c[0]).toLowerCase());
+    });
+
+    records.push({
+     id:uid(),
+     name,
+     category:get('category')||'Other',
+     town:get('town'),
+     region:get('region')||'Other',
+     phone:get('phone'),
+     url:get('url'),
+     lat:get('lat'),
+     lon:get('lon'),
+     reviewed:get('reviewed'),
+     notes:get('notes'),
+     checks
+    });
+
+    added++;
+   });
+
+   save();
+   render();
+
+   toast(`${added} business record(s) imported.`);
+
+  }catch(e){
+
+   toast('Could not read this CSV. Check its column headings.');
+
+  }
+ };
+
+ reader.readAsText(file);
+}
+
+function demo(){
+
+ if(records.length&&!confirm('Add illustrative demo records to the current register?'))return;
+
+ const examples=[
+  {
+   name:'Demo Restaurant – Kololi',
+   category:'Restaurant',
+   town:'Kololi',
+   region:'Kanifing',
+   lat:13.4462,
+   lon:-16.7185
+  },
+  {
+   name:'Demo Guesthouse – Kotu',
+   category:'Hotel / Guesthouse',
+   town:'Kotu',
+   region:'Kanifing',
+   lat:13.4568,
+   lon:-16.7041
+  },
+  {
+   name:'Demo Retail Shop – Banjul',
+   category:'Retail / Supermarket',
+   town:'Banjul',
+   region:'Banjul',
+   lat:13.4549,
+   lon:-16.5790
+  },
+  {
+   name:'Demo Pharmacy – Brikama',
+   category:'Pharmacy / Health',
+   town:'Brikama',
+   region:'Brikama',
+   lat:13.2714,
+   lon:-16.6494
+  },
+  {
+   name:'Demo Tourism Service – Bakau',
+   category:'Tourism / Leisure',
+   town:'Bakau',
+   region:'Kanifing',
+   lat:13.4781,
+   lon:-16.6819
+  }
+ ];
+
+ examples.forEach((x,i)=>{
+
+  const checks={};
+
+  CHECKS.forEach((c,j)=>{
+   checks[c[0]]=i===0?j<7:i===1?j<4:i===2?j<2:false;
+  });
+
+  records.push({
+   ...x,
+   id:uid(),
+   phone:'',
+   url:'',
+   checks,
+   notes:'Illustrative demo data only.'
+  });
+
+ });
+
+ save();
+ render();
+
+ toast('Illustrative demo records loaded. Not real business listings.');
+}
+
+function setBasemap(layer,button){
+
+ if(activeLayer)map.removeLayer(activeLayer);
+
+ activeLayer=layer.addTo(map);
+
+ document.querySelectorAll('.map-actions button').forEach(b=>{
+  b.classList.remove('active');
+ });
+
+ button.classList.add('active');
+}
+
+/* EVENT LISTENERS */
+
+$('saveBizBtn').addEventListener('click',addBusiness);
+$('clearFormBtn').addEventListener('click',clearForm);
+$('addTopBtn').addEventListener('click',()=>$('bizName').focus());
+
+['searchInput','regionFilter','categoryFilter','statusFilter'].forEach(id=>{
+ $(id).addEventListener('input',renderList);
+});
+
+$('closeModal').onclick=closeAudit;
+$('cancelAuditBtn').onclick=closeAudit;
+$('saveAuditBtn').onclick=saveAudit;
+$('deleteBizBtn').onclick=deleteSelected;
+
+$('importBtn').onclick=()=>$('csvFile').click();
+
+$('csvFile').onchange=e=>{
+ if(e.target.files[0])importCSV(e.target.files[0]);
+ e.target.value='';
+};
+
+$('exportBtn').onclick=exportCSV;
+$('demoBtn').onclick=demo;
+
+$('streetBtn').onclick=()=>setBasemap(streetLayer,$('streetBtn'));
+$('satBtn').onclick=()=>setBasemap(satLayer,$('satBtn'));
+
+$('fitBtn').onclick=()=>{
+
+ if(markers.length){
+
+  const group=L.featureGroup(markers);
+
+  map.fitBounds(group.getBounds().pad(.18),{maxZoom:14});
+
+ }else if(boundaryLayer&&boundaryLayer.getBounds().isValid()){
+
+  map.fitBounds(boundaryLayer.getBounds(),{padding:[24,24]});
+
+ }else{
+
+  map.setView([13.42,-15.65],8);
+
+ }
+};
+
+$('boundaryBtn').onclick=toggleBoundary;
+
+$('resetMonthly').onclick=()=>{
+
+ document.querySelectorAll('.global-check').forEach(c=>{
+  c.checked=false;
+ });
+
+ toast('Monthly reminder checklist reset.');
+};
+
+/* START APPLICATION */
+
+load();
+initMap();
+render();
+loadGambiaBoundary();
+
+if(records.length){
+ selectBusiness(records[0].id);
+}
+
+})();
+</script>
+</body>
+</html>
