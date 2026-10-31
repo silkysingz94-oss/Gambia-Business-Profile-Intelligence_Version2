@@ -9,7 +9,6 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
 <style>
 :root{--navy:#102b3f;--navy2:#173e55;--teal:#0f9d91;--teal2:#dff5f1;--gold:#e5a93d;--ink:#172b3a;--muted:#718292;--line:#e4ebef;--bg:#f3f6f8;--white:#fff;--red:#d85b5b;--green:#238b65;--shadow:0 8px 24px rgba(22,47,65,.07)}
 *{box-sizing:border-box}
@@ -76,6 +75,12 @@ button{cursor:pointer}
 .map-actions button{border:0;background:#f4f7f8;border-radius:5px;padding:6px 8px;color:#536a79;font-size:9px}
 .map-actions button.active{background:var(--teal2);color:#087d73}
 .map-actions button.boundary-loading{opacity:.65;cursor:wait}
+.map-actions button.admin-toggle{font-weight:800}
+.map-actions button.admin-toggle.active{background:#e8f3ff;color:#185a91}
+.map-actions button.admin-toggle[data-level="district"].active{background:#fff2df;color:#9a5c08}
+.map-actions button.admin-toggle[data-level="ward"].active{background:#f2eaff;color:#7041a5}
+.boundary-status{display:inline-flex;align-items:center;gap:5px;margin-left:8px}
+.boundary-status i{color:var(--teal)}
 #map{height:100%;width:100%;background:#e9eff1}
 .map-footer{position:absolute;bottom:12px;left:12px;right:12px;z-index:400;display:flex;justify-content:space-between;gap:8px;pointer-events:none}
 .map-legend,.map-status{background:#fff;border:1px solid #e2e9ed;border-radius:8px;padding:8px 10px;box-shadow:0 4px 14px #102b3f18;font-size:8px;color:#526878;pointer-events:auto}
@@ -118,7 +123,6 @@ button{cursor:pointer}
 .popup-title{font:800 11px Manrope;margin-bottom:4px}
 .popup-small{font-size:9px;color:#657987;line-height:1.5}
 .popup-btn{margin-top:7px;background:var(--teal);color:white;border:0;border-radius:5px;padding:6px 8px;font-size:9px}
-
 @media(max-width:1050px){
  .workspace{grid-template-columns:minmax(245px,.9fr) minmax(320px,1.2fr)}
  .right-panel{grid-column:1/-1;min-height:330px}
@@ -144,150 +148,43 @@ button{cursor:pointer}
 }
 </style>
 </head>
-
 <body>
 <div class="app">
-
 <header class="topbar">
- <div class="brand">
-  <div class="brandmark"><i class="fa-solid fa-location-dot"></i></div>
-  <div>
-   <h1>GAMBIA BUSINESS PROFILE INTELLIGENCE</h1>
-   <small>SILKYSINGZ GEOAI • LOCAL DIGITAL PRESENCE</small>
-  </div>
- </div>
- <div class="topright">
-  <span class="live"><i class="dot"></i> LOCAL WORKSPACE</span>
-  <span>THE GAMBIA</span>
-  <span><i class="fa-solid fa-globe"></i> 13.45°N · 16.58°W</span>
- </div>
+ <div class="brand"><div class="brandmark"><i class="fa-solid fa-location-dot"></i></div><div><h1>GAMBIA BUSINESS PROFILE INTELLIGENCE</h1><small>SILKYSINGZ GEOAI • LOCAL DIGITAL PRESENCE</small></div></div>
+ <div class="topright"><span class="live"><i class="dot"></i> LOCAL WORKSPACE</span><span>THE GAMBIA</span><span><i class="fa-solid fa-globe"></i> 13.45°N · 16.58°W</span></div>
 </header>
-
-<div class="toolbar">
- <div class="crumb">GBoS GEOAI / <b>Business Visibility & Profile Audit</b></div>
- <div class="toolbar-actions">
-  <button class="btn" id="importBtn"><i class="fa-solid fa-file-import"></i> Import CSV</button>
-  <button class="btn" id="exportBtn"><i class="fa-solid fa-file-export"></i> Export CSV</button>
-  <button class="btn primary" id="addTopBtn"><i class="fa-solid fa-plus"></i> Add business</button>
-  <input type="file" id="csvFile" accept=".csv,text/csv" hidden>
- </div>
-</div>
-
+<div class="toolbar"><div class="crumb">GBoS GEOAI / <b>Business Visibility & Profile Audit</b></div><div class="toolbar-actions"><button class="btn" id="importBtn"><i class="fa-solid fa-file-import"></i> Import CSV</button><button class="btn" id="exportBtn"><i class="fa-solid fa-file-export"></i> Export CSV</button><button class="btn primary" id="addTopBtn"><i class="fa-solid fa-plus"></i> Add business</button><input type="file" id="csvFile" accept=".csv,text/csv" hidden></div></div>
 <main class="workspace">
-
 <section class="panel left-panel">
- <div class="panel-head">
-  <div>
-   <div class="eyebrow">Directory & controls</div>
-   <h2>Business Profiles</h2>
-   <p>Build and manage a local profile-audit register</p>
-  </div>
-  <i class="fa-solid fa-store" style="color:var(--teal)"></i>
- </div>
-
+ <div class="panel-head"><div><div class="eyebrow">Directory & controls</div><h2>Business Profiles</h2><p>Build and manage a local profile-audit register</p></div><i class="fa-solid fa-store" style="color:var(--teal)"></i></div>
  <div class="scroll">
   <div class="section">
    <h3 class="section-title"><i class="fa-solid fa-filter"></i> Search & filter</h3>
    <div class="field"><input id="searchInput" placeholder="Search business, town or category..."></div>
    <div class="field-row">
-    <div class="field">
-     <label>REGION / LGA</label>
-     <select id="regionFilter"><option value="">All areas</option></select>
-    </div>
-    <div class="field">
-     <label>CATEGORY</label>
-     <select id="categoryFilter"><option value="">All categories</option></select>
-    </div>
+    <div class="field"><label>REGION / LGA</label><select id="regionFilter"><option value="">All areas</option></select></div>
+    <div class="field"><label>CATEGORY</label><select id="categoryFilter"><option value="">All categories</option></select></div>
    </div>
-   <div class="field">
-    <label>AUDIT STATUS</label>
-    <select id="statusFilter">
-     <option value="">All statuses</option>
-     <option>Needs attention</option>
-     <option>Partially checked</option>
-     <option>Up to date</option>
-     <option>Not audited</option>
-    </select>
-   </div>
+   <div class="field"><label>AUDIT STATUS</label><select id="statusFilter"><option value="">All statuses</option><option>Needs attention</option><option>Partially checked</option><option>Up to date</option><option>Not audited</option></select></div>
    <p class="filter-note">The directory is a user-managed audit register. It does not automatically access or verify Google Business Profiles.</p>
   </div>
-
   <div class="section">
    <h3 class="section-title"><i class="fa-solid fa-address-card"></i> Business register <span id="recordCount" style="margin-left:auto;color:var(--muted)">0 records</span></h3>
-   <div class="profile-list" id="profileList">
-    <div class="empty">No businesses added yet.<br>Use “Add business” to create your first record, or load the illustrative demo dataset.</div>
-   </div>
+   <div class="profile-list" id="profileList"><div class="empty">No businesses added yet.<br>Use “Add business” to create your first record, or load the illustrative demo dataset.</div></div>
   </div>
-
   <div class="section add-form" id="addForm">
    <h3 class="section-title"><i class="fa-solid fa-circle-plus"></i> Add a business</h3>
-   <div class="field">
-    <label>BUSINESS NAME *</label>
-    <input id="bizName" placeholder="e.g. Example Restaurant">
-   </div>
-   <div class="field-row">
-    <div class="field">
-     <label>CATEGORY</label>
-     <select id="bizCategory">
-      <option>Restaurant</option>
-      <option>Hotel / Guesthouse</option>
-      <option>Retail / Supermarket</option>
-      <option>Pharmacy / Health</option>
-      <option>Tourism / Leisure</option>
-      <option>Professional service</option>
-      <option>Other</option>
-     </select>
-    </div>
-    <div class="field">
-     <label>TOWN / AREA</label>
-     <input id="bizTown" placeholder="e.g. Kololi">
-    </div>
-   </div>
-   <div class="field-row">
-    <div class="field">
-     <label>REGION / LGA</label>
-     <select id="bizRegion">
-      <option value="">Select area</option>
-      <option>Banjul</option>
-      <option>Kanifing</option>
-      <option>Brikama</option>
-      <option>Farafenni</option>
-      <option>Janjanbureh</option>
-      <option>Basse</option>
-      <option>Kerewan</option>
-      <option>Other</option>
-     </select>
-    </div>
-    <div class="field">
-     <label>PHONE</label>
-     <input id="bizPhone" placeholder="+220 ...">
-    </div>
-   </div>
-   <div class="field">
-    <label>GOOGLE PROFILE URL (OPTIONAL)</label>
-    <input id="bizUrl" placeholder="https://maps.google.com/...">
-   </div>
-   <div class="field-row">
-    <div class="field">
-     <label>LATITUDE</label>
-     <input id="bizLat" type="number" step="any" placeholder="13.45">
-    </div>
-    <div class="field">
-     <label>LONGITUDE</label>
-     <input id="bizLon" type="number" step="any" placeholder="-16.58">
-    </div>
-   </div>
-   <div class="form-actions">
-    <button class="btn primary" id="saveBizBtn"><i class="fa-solid fa-plus"></i> Save business</button>
-    <button class="btn" id="clearFormBtn">Clear</button>
-   </div>
+   <div class="field"><label>BUSINESS NAME *</label><input id="bizName" placeholder="e.g. Example Restaurant"></div>
+   <div class="field-row"><div class="field"><label>CATEGORY</label><select id="bizCategory"><option>Restaurant</option><option>Hotel / Guesthouse</option><option>Retail / Supermarket</option><option>Pharmacy / Health</option><option>Tourism / Leisure</option><option>Professional service</option><option>Other</option></select></div><div class="field"><label>TOWN / AREA</label><input id="bizTown" placeholder="e.g. Kololi"></div></div>
+   <div class="field-row"><div class="field"><label>REGION / LGA</label><select id="bizRegion"><option value="">Select area</option><option>Banjul</option><option>Kanifing</option><option>Brikama</option><option>Farafenni</option><option>Janjanbureh</option><option>Basse</option><option>Kerewan</option><option>Other</option></select></div><div class="field"><label>PHONE</label><input id="bizPhone" placeholder="+220 ..."></div></div>
+   <div class="field"><label>GOOGLE PROFILE URL (OPTIONAL)</label><input id="bizUrl" placeholder="https://maps.google.com/..."></div>
+   <div class="field-row"><div class="field"><label>LATITUDE</label><input id="bizLat" type="number" step="any" placeholder="13.45"></div><div class="field"><label>LONGITUDE</label><input id="bizLon" type="number" step="any" placeholder="-16.58"></div></div>
+   <div class="form-actions"><button class="btn primary" id="saveBizBtn"><i class="fa-solid fa-plus"></i> Save business</button><button class="btn" id="clearFormBtn">Clear</button></div>
   </div>
-
   <div class="section">
    <h3 class="section-title"><i class="fa-solid fa-lightbulb"></i> Getting started</h3>
-   <button class="btn" id="demoBtn" style="width:100%">
-    <i class="fa-solid fa-flask"></i> Load illustrative demo records
-   </button>
+   <button class="btn" id="demoBtn" style="width:100%"><i class="fa-solid fa-flask"></i> Load illustrative demo records</button>
    <p class="filter-note" style="margin-top:7px">Demo entries are fictional examples for testing the interface; they are not verified Gambian businesses.</p>
   </div>
  </div>
@@ -295,85 +192,25 @@ button{cursor:pointer}
 
 <section class="panel map-panel">
  <div id="map"></div>
- <div class="map-head">
-  <div class="map-label">
-   <strong><i class="fa-solid fa-map-location-dot" style="color:var(--teal)"></i> Business location explorer</strong>
-   <span>Map view of registered audit records</span>
-  </div>
-  <div class="map-actions">
-   <button id="streetBtn" class="active">Street</button>
-   <button id="satBtn">Satellite</button>
-   <button id="boundaryBtn" class="active" title="Show or hide administrative boundary">
-    <i class="fa-solid fa-draw-polygon"></i> Boundary
-   </button>
-   <button id="fitBtn" title="Zoom to records"><i class="fa-solid fa-expand"></i></button>
-  </div>
- </div>
- <div class="map-footer">
-  <div class="map-legend">
-   <span class="legend-item"><i class="legend-dot" style="background:#238b65"></i> Up to date</span>
-   <span class="legend-item"><i class="legend-dot" style="background:#e5a93d"></i> Partial</span>
-   <span class="legend-item"><i class="legend-dot" style="background:#d85b5b"></i> Attention</span>
-   <span class="legend-item"><i class="legend-dot" style="background:#8b9aa4"></i> Not audited</span>
-  </div>
-  <div class="map-status" id="mapStatus">Ready · Add or select a business to explore its location</div>
- </div>
+ <div class="map-head"><div class="map-label"><strong><i class="fa-solid fa-map-location-dot" style="color:var(--teal)"></i> Business location explorer</strong><span>Map view of registered audit records</span></div><div class="map-actions"><button id="streetBtn" class="active">Street</button><button id="satBtn">Satellite</button><button id="lgaBtn" class="admin-toggle active" data-level="lga" title="Toggle all 8 LGA boundaries">LGA</button><button id="districtBtn" class="admin-toggle active" data-level="district" title="Toggle all 49 district boundaries">District</button><button id="wardBtn" class="admin-toggle" data-level="ward" title="Toggle all 115 ward boundaries">Ward</button><button id="fitBtn" title="Zoom to records"><i class="fa-solid fa-expand"></i></button></div></div>
+ <div class="map-footer"><div class="map-legend"><span class="legend-item"><i class="legend-dot" style="background:#238b65"></i> Up to date</span><span class="legend-item"><i class="legend-dot" style="background:#e5a93d"></i> Partial</span><span class="legend-item"><i class="legend-dot" style="background:#d85b5b"></i> Attention</span><span class="legend-item"><i class="legend-dot" style="background:#8b9aa4"></i> Not audited</span></div><div class="map-status" id="mapStatus">Ready · Add or select a business to explore its location</div></div>
 </section>
 
 <section class="panel right-panel">
- <div class="panel-head">
-  <div>
-   <div class="eyebrow">Monitoring & insights</div>
-   <h2>Digital Presence Analytics</h2>
-   <p>Completeness, audit progress and recommended actions</p>
-  </div>
-  <i class="fa-solid fa-chart-line" style="color:var(--teal)"></i>
- </div>
-
+ <div class="panel-head"><div><div class="eyebrow">Monitoring & insights</div><h2>Digital Presence Analytics</h2><p>Completeness, audit progress and recommended actions</p></div><i class="fa-solid fa-chart-line" style="color:var(--teal)"></i></div>
  <div class="scroll">
-  <div class="section">
-   <h3 class="section-title"><i class="fa-solid fa-gauge-high"></i> Overview indicators</h3>
+  <div class="section"><h3 class="section-title"><i class="fa-solid fa-gauge-high"></i> Overview indicators</h3>
    <div class="kpi-grid">
-    <div class="kpi">
-     <div class="label">Registered profiles</div>
-     <div class="value" id="kpiTotal">0</div>
-     <div class="sub">Businesses in this register</div>
-    </div>
-    <div class="kpi">
-     <div class="label">Up to date</div>
-     <div class="value" id="kpiGood">0</div>
-     <div class="sub">All checks completed</div>
-    </div>
-    <div class="kpi">
-     <div class="label">Need attention</div>
-     <div class="value" id="kpiBad">0</div>
-     <div class="sub">One or more issues found</div>
-    </div>
-    <div class="kpi">
-     <div class="label">Audit completion</div>
-     <div class="value" id="kpiCompletion">0%</div>
-     <div class="sub">Checklist items completed</div>
-    </div>
+    <div class="kpi"><div class="label">Registered profiles</div><div class="value" id="kpiTotal">0</div><div class="sub">Businesses in this register</div></div>
+    <div class="kpi"><div class="label">Up to date</div><div class="value" id="kpiGood">0</div><div class="sub">All checks completed</div></div>
+    <div class="kpi"><div class="label">Need attention</div><div class="value" id="kpiBad">0</div><div class="sub">One or more issues found</div></div>
+    <div class="kpi"><div class="label">Audit completion</div><div class="value" id="kpiCompletion">0%</div><div class="sub">Checklist items completed</div></div>
    </div>
   </div>
-
-  <div class="section">
-   <h3 class="section-title"><i class="fa-solid fa-chart-simple"></i> Audit checklist completion</h3>
-   <div id="checkProgress"></div>
-  </div>
-
-  <div class="section">
-   <h3 class="section-title"><i class="fa-solid fa-layer-group"></i> Records by category</h3>
-   <div id="categoryChart"><div class="empty">Add records to view category distribution.</div></div>
-  </div>
-
-  <div class="section">
-   <h3 class="section-title"><i class="fa-solid fa-clipboard-check"></i> Selected business audit</h3>
-   <div id="auditDetail"><div class="empty">Select a business from the directory or map to inspect its audit checklist.</div></div>
-  </div>
-
-  <div class="section">
-   <h3 class="section-title"><i class="fa-solid fa-list-check"></i> Monthly 10-minute review</h3>
+  <div class="section"><h3 class="section-title"><i class="fa-solid fa-chart-simple"></i> Audit checklist completion</h3><div id="checkProgress"></div></div>
+  <div class="section"><h3 class="section-title"><i class="fa-solid fa-layer-group"></i> Records by category</h3><div id="categoryChart"><div class="empty">Add records to view category distribution.</div></div></div>
+  <div class="section"><h3 class="section-title"><i class="fa-solid fa-clipboard-check"></i> Selected business audit</h3><div id="auditDetail"><div class="empty">Select a business from the directory or map to inspect its audit checklist.</div></div></div>
+  <div class="section"><h3 class="section-title"><i class="fa-solid fa-list-check"></i> Monthly 10-minute review</h3>
    <div class="audit-card">
     <h3>Google Business Profile quality checks</h3>
     <div class="checkrow"><input type="checkbox" class="global-check"> Business name and category are correct</div>
@@ -387,44 +224,20 @@ button{cursor:pointer}
     <button class="btn" id="resetMonthly" style="width:100%;margin-top:8px">Reset monthly checklist</button>
    </div>
   </div>
-
-  <div class="section">
-   <h3 class="section-title"><i class="fa-solid fa-shield-halved"></i> Data & methodology</h3>
-   <div class="recommendation">
-    <b>Important limitation:</b> This is an independent planning and audit dashboard. It does not connect to Google Business Profile, does not scrape Google Maps, and cannot confirm that a business listing exists or that a link works. Checks must be completed manually by the business owner or authorised auditor. A production integration would require approved Google APIs, OAuth consent and appropriate permissions.
-   </div>
+  <div class="section"><h3 class="section-title"><i class="fa-solid fa-shield-halved"></i> Data & methodology</h3>
+   <div class="recommendation"><b>Important limitation:</b> This is an independent planning and audit dashboard. It does not connect to Google Business Profile, does not scrape Google Maps, and cannot confirm that a business listing exists or that a link works. Checks must be completed manually by the business owner or authorised auditor. A production integration would require approved Google APIs, OAuth consent and appropriate permissions.</div>
    <p class="filter-note" style="margin-top:8px">Suggested routine: review profiles monthly, after a change of telephone number, website, opening hours, ownership or service provider, and before major tourism or promotional periods.</p>
   </div>
  </div>
 </section>
-
 </main>
-
-<footer class="footer">
- <span>Produced by Ansu Singhateh · GIS Analyst · GIS / Cartography Unit · GBoS</span>
- <span>GBoS GEOAI • SILKYSINGZ GEOAI · Research & educational use · Boundary: geoBoundaries</span>
-</footer>
+<footer class="footer"><span>Produced by Ansu Singhateh · GIS Analyst · GIS / Cartography Unit · GBoS</span><span>GBoS GEOAI • SILKYSINGZ GEOAI · Research & educational use · Boundaries: LGA / District / Ward · geoBoundaries / OCHA COD-AB</span></footer>
 </div>
 
-<div class="modal-backdrop" id="auditModal">
- <div class="modal">
-  <div class="modal-head">
-   <h3 id="modalTitle">Business profile audit</h3>
-   <button class="btn" id="closeModal">✕</button>
-  </div>
-  <div class="modal-body" id="modalBody"></div>
-  <div class="modal-foot">
-   <button class="btn" id="deleteBizBtn" style="margin-right:auto;color:var(--red)">Delete record</button>
-   <button class="btn" id="cancelAuditBtn">Cancel</button>
-   <button class="btn primary" id="saveAuditBtn">Save audit</button>
-  </div>
- </div>
-</div>
-
+<div class="modal-backdrop" id="auditModal"><div class="modal"><div class="modal-head"><h3 id="modalTitle">Business profile audit</h3><button class="btn" id="closeModal">✕</button></div><div class="modal-body" id="modalBody"></div><div class="modal-foot"><button class="btn" id="deleteBizBtn" style="margin-right:auto;color:var(--red)">Delete record</button><button class="btn" id="cancelAuditBtn">Cancel</button><button class="btn primary" id="saveAuditBtn">Save audit</button></div></div></div>
 <div class="toast" id="toast"></div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
 (() => {
 'use strict';
@@ -456,9 +269,41 @@ const CHECKS=[
 ];
 
 let records=[],selectedId=null,editingId=null,map,markers=[],streetLayer,satLayer,activeLayer;
-let boundaryLayer=null,boundaryVisible=true,boundaryLoaded=false;
 
-const BOUNDARY_API='https://www.geoboundaries.org/api/current/gbOpen/GMB/ADM0/';
+const ADMIN_LEVELS={
+ lga:{
+  adm:'ADM1',
+  label:'LGA',
+  expected:8,
+  color:'#0f9d91',
+  weight:2.6,
+  visible:true,
+  layer:null,
+  loaded:false
+ },
+ district:{
+  adm:'ADM2',
+  label:'District',
+  expected:49,
+  color:'#e09a32',
+  weight:1.8,
+  visible:true,
+  layer:null,
+  loaded:false
+ },
+ ward:{
+  adm:'ADM3',
+  label:'Ward',
+  expected:115,
+  color:'#8657b5',
+  weight:1.15,
+  visible:true,
+  layer:null,
+  loaded:false
+ }
+};
+
+const ADMIN_API='https://www.geoboundaries.org/api/current/gbOpen/GMB/';
 
 const $=id=>document.getElementById(id);
 
@@ -519,110 +364,58 @@ function issueCount(r){
 }
 
 /* =========================================================
-   THE GAMBIA BOUNDARY LOADER
-   1. geoBoundaries current ADM0
-   2. GitHub-hosted Natural Earth country GeoJSON
-   Transparent fill with teal outline
-========================================================= */
+   ADMINISTRATIVE BOUNDARY GEOJSON LOADER
+   ADM1 = LGA
+   ADM2 = District
+   ADM3 = Ward
+   ========================================================= */
 
-async function loadGambiaBoundary(){
+async function loadAdministrativeBoundaries(){
 
- const btn=$('boundaryBtn');
  const status=$('mapStatus');
 
- const fallbackUrl=
-  'https://raw.githubusercontent.com/datasets/geo-countries/main/data/countries.geojson';
+ const buttons={
+  lga:$('lgaBtn'),
+  district:$('districtBtn'),
+  ward:$('wardBtn')
+ };
 
- if(btn){
-  btn.disabled=true;
-  btn.classList.add('boundary-loading');
-  btn.innerHTML='<i class="fa-solid fa-spinner fa-spin"></i> Loading';
- }
+ const getJSON=async url=>{
+  const response=await fetch(url,{mode:'cors',cache:'no-cache'});
+  if(!response.ok)throw new Error('HTTP '+response.status+' · '+url);
+  return response.json();
+ };
 
- status.textContent='Loading The Gambia national boundary…';
+ const setButton=(key,loading)=>{
+  const b=buttons[key];
+  if(!b)return;
 
- async function getJSON(url){
+  b.disabled=loading;
+  b.classList.toggle('boundary-loading',loading);
+  b.classList.toggle('active',ADMIN_LEVELS[key].visible);
+ };
 
-  const response=await fetch(url,{
-   mode:'cors',
-   cache:'no-cache'
-  });
+ const featureName=p=>
+  p.shapeName||
+  p.NAME_3||
+  p.NAME_2||
+  p.NAME_1||
+  p.name||
+  p.NAME||
+  p.admin||
+  p.ADMIN||
+  p.name_en||
+  p.VARNAME_1||
+  'Administrative unit';
 
-  if(!response.ok){
-   throw new Error('HTTP '+response.status+' while requesting '+url);
-  }
+ const loadOne=async key=>{
 
-  return await response.json();
- }
-
- function renderBoundary(geojson,sourceName){
-
-  if(boundaryLayer){
-   map.removeLayer(boundaryLayer);
-  }
-
-  boundaryLayer=L.geoJSON(geojson,{
-
-   style:()=>({
-    color:'#0f9d91',
-    weight:2.5,
-    opacity:1,
-    fill:false,
-    fillOpacity:0,
-    dashArray:'6 4'
-   }),
-
-   interactive:true,
-
-   onEachFeature:(feature,layer)=>{
-
-    const props=feature.properties||{};
-
-    const name=
-     props.shapeName||
-     props.NAME_0||
-     props.name||
-     props.ADMIN||
-     'The Gambia';
-
-    layer.bindTooltip(esc(name),{
-     sticky:true,
-     direction:'auto'
-    });
-   }
-
-  });
-
-  if(boundaryVisible){
-   boundaryLayer.addTo(map);
-  }
-
-  boundaryLoaded=true;
-
-  const bounds=boundaryLayer.getBounds();
-
-  if(bounds.isValid()){
-   map.fitBounds(bounds,{padding:[24,24]});
-  }
-
-  status.textContent=
-   'The Gambia boundary loaded · Transparent fill · Source: '+sourceName;
-
-  if(btn){
-   btn.disabled=false;
-   btn.classList.remove('boundary-loading');
-   btn.classList.toggle('active',boundaryVisible);
-   btn.innerHTML='<i class="fa-solid fa-draw-polygon"></i> Boundary';
-  }
- }
-
- try{
-
-  /* SOURCE 1: geoBoundaries */
+  const cfg=ADMIN_LEVELS[key];
+  setButton(key,true);
 
   try{
 
-   const metadata=await getJSON(BOUNDARY_API);
+   const metadata=await getJSON(ADMIN_API+cfg.adm+'/');
 
    const geojsonUrl=
     metadata.gjDownloadURL||
@@ -630,123 +423,149 @@ async function loadGambiaBoundary(){
     metadata.gjDownloadURLSimplified;
 
    if(!geojsonUrl){
-    throw new Error('geoBoundaries metadata did not contain a GeoJSON URL');
+    throw new Error('No GeoJSON download URL in '+cfg.adm+' metadata');
    }
 
    const geojson=await getJSON(geojsonUrl);
 
-   if(!geojson.features||!Array.isArray(geojson.features)){
-    throw new Error('geoBoundaries response is not a GeoJSON FeatureCollection');
+   if(
+    !geojson||
+    geojson.type!=='FeatureCollection'||
+    !Array.isArray(geojson.features)||
+    !geojson.features.length
+   ){
+    throw new Error('Empty or invalid '+cfg.adm+' GeoJSON');
    }
 
-   renderBoundary(geojson,'geoBoundaries');
-   return;
+   if(cfg.layer)map.removeLayer(cfg.layer);
 
-  }catch(error){
+   cfg.layer=L.geoJSON(geojson,{
 
-   console.warn('geoBoundaries current source failed:',error);
-  }
+    style:()=>({
+     color:cfg.color,
+     weight:cfg.weight,
+     opacity:.95,
+     fill:false,
+     fillOpacity:0,
+     dashArray:
+      key==='lga'?'7 4':
+      key==='district'?'3 3':
+      '1 3'
+    }),
 
-  /* SOURCE 2: GITHUB NATURAL EARTH COUNTRY BOUNDARIES */
+    onEachFeature:(feature,layer)=>{
 
-  try{
+     const p=feature.properties||{};
 
-   const world=await getJSON(fallbackUrl);
+     layer.bindTooltip(
+      '<b>'+esc(featureName(p))+'</b><br><span>'+cfg.label+' boundary</span>',
+      {sticky:true,direction:'auto'}
+     );
 
-   if(!world.features||!Array.isArray(world.features)){
-    throw new Error('Fallback response is not a GeoJSON FeatureCollection');
-   }
-
-   const features=world.features.filter(feature=>{
-
-    const p=feature.properties||{};
-
-    const values=[
-     p['ISO3166-1-Alpha-3'],
-     p.ISO_A3,
-     p.iso_a3,
-     p.ADM0_A3,
-     p.ADMIN,
-     p.name,
-     p.NAME,
-     p.name_long,
-     p.SOVEREIGNT
-    ].map(v=>String(v||'').trim().toLowerCase());
-
-    return values.includes('gmb')||
-           values.includes('gambia')||
-           values.includes('the gambia');
+     layer.bindPopup(
+      '<b>'+esc(featureName(p))+'</b><br>'+cfg.label+' · The Gambia'
+     );
+    }
    });
 
-   if(!features.length){
-    throw new Error('Gambia feature not found in fallback GeoJSON');
-   }
+   cfg.loaded=true;
 
-   renderBoundary(
-    {type:'FeatureCollection',features},
-    'GitHub Natural Earth country boundaries'
-   );
+   if(cfg.visible)cfg.layer.addTo(map);
 
-   return;
+   setButton(key,false);
+
+   return {
+    key,
+    count:geojson.features.length,
+    expected:cfg.expected,
+    ok:true
+   };
 
   }catch(error){
 
-   console.error('GitHub fallback source failed:',error);
+   console.error(cfg.label+' boundary load failed:',error);
+
+   setButton(key,false);
+
+   return {
+    key,
+    ok:false,
+    error:error.message
+   };
+  }
+ };
+
+ status.textContent='Loading LGA, district and ward boundary GeoJSON…';
+
+ const results=await Promise.all(
+  Object.keys(ADMIN_LEVELS).map(loadOne)
+ );
+
+ const good=results.filter(x=>x.ok);
+
+ const details=results.map(x=>{
+  const c=ADMIN_LEVELS[x.key];
+
+  return x.ok
+   ?c.label+': '+x.count+(x.count===c.expected?'':' (expected '+c.expected+')')
+   :c.label+': unavailable';
+ });
+
+ if(good.length){
+
+  const lga=ADMIN_LEVELS.lga.layer;
+
+  const bounds=
+   lga&&lga.getBounds().isValid()
+    ?lga.getBounds()
+    :good.map(x=>ADMIN_LEVELS[x.key].layer.getBounds())
+       .reduce((a,b)=>a.extend(b));
+
+  if(bounds&&bounds.isValid()){
+   map.fitBounds(bounds,{padding:[24,24]});
   }
 
-  throw new Error('All boundary data sources failed');
+  status.textContent=details.join(' · ')+' · Source: geoBoundaries / OCHA COD-AB';
 
- }catch(error){
+ }else{
 
-  console.error('Boundary loading failed:',error);
-
-  status.textContent=
-   'Boundary unavailable. Check your internet connection, then click Boundary to retry.';
-
-  if(btn){
-   btn.disabled=false;
-   btn.classList.remove('boundary-loading','active');
-   btn.innerHTML='<i class="fa-solid fa-rotate"></i> Retry boundary';
-  }
-
- }finally{
-
-  if(btn){
-   btn.disabled=false;
-   btn.classList.remove('boundary-loading');
-  }
+  status.textContent='Administrative boundaries unavailable. Check connection and reload the page.';
  }
 }
 
-function toggleBoundary(){
+function toggleAdminBoundary(key){
 
- // If no boundary has loaded, clicking the button retries the download.
- if(!boundaryLoaded){
-  loadGambiaBoundary();
+ const cfg=ADMIN_LEVELS[key];
+ if(!cfg)return;
+
+ cfg.visible=!cfg.visible;
+
+ const btn=$(key+'Btn');
+
+ if(cfg.layer){
+
+  if(cfg.visible){
+   cfg.layer.addTo(map);
+  }else{
+   map.removeLayer(cfg.layer);
+  }
+ }
+
+ btn.classList.toggle('active',cfg.visible);
+
+ if(!cfg.loaded){
+  $('mapStatus').textContent=cfg.label+' boundary data has not loaded yet.';
   return;
  }
 
- boundaryVisible=!boundaryVisible;
-
- const btn=$('boundaryBtn');
-
- if(boundaryLayer){
-
-  if(boundaryVisible){
-   boundaryLayer.addTo(map);
-   btn.classList.add('active');
-  }else{
-   map.removeLayer(boundaryLayer);
-   btn.classList.remove('active');
-  }
- }
-
- if(boundaryLoaded){
-  $('mapStatus').textContent=boundaryVisible
-   ?'The Gambia boundary visible · Transparent fill'
-   :'The Gambia boundary hidden';
- }
+ $('mapStatus').textContent=
+  cfg.label+' boundaries '+(cfg.visible?'visible':'hidden')+
+  ' · '+cfg.expected+' expected units';
 }
+
+/* =========================================================
+   MAP INITIALISATION
+   ========================================================= */
 
 function initMap(){
 
@@ -775,7 +594,6 @@ function initMap(){
 }
 
 function markerColor(r){
-
  const s=status(r);
 
  return s==='Up to date'?'#238b65':
@@ -802,15 +620,15 @@ function refreshMap(){
    fillOpacity:.95
   }).addTo(map);
 
-  m.bindPopup(`
-   <div class="popup-title">${esc(r.name)}</div>
+  m.bindPopup(
+   `<div class="popup-title">${esc(r.name)}</div>
    <div class="popup-small">
-    ${esc(r.category)} · ${esc(r.town||r.region||'The Gambia')}
-    <br>Status: ${esc(status(r))}
-    <br>Audit items outstanding: ${issueCount(r)}
+   ${esc(r.category)} · ${esc(r.town||r.region||'The Gambia')}<br>
+   Status: ${esc(status(r))}<br>
+   Audit items outstanding: ${issueCount(r)}
    </div>
-   <button class="popup-btn" onclick="window.selectBusiness('${r.id}')">Open audit</button>
-  `);
+   <button class="popup-btn" onclick="window.selectBusiness('${r.id}')">Open audit</button>`
+  );
 
   m.on('click',()=>selectBusiness(r.id));
 
@@ -875,14 +693,13 @@ function renderList(){
       </div>
       <div class="profile-meta">${esc(r.category)} · ${esc(r.town||r.region||'Area not set')}</div>
       <div class="profile-meta">${CHECKS.filter(c=>r.checks&&r.checks[c[0]]).length}/${CHECKS.length} checks completed</div>
-     </div>
-    `;
+     </div>`;
    }).join('')
   :'<div class="empty">No matching businesses. Change the filters or add a record.</div>';
 
- document.querySelectorAll('.profile-item').forEach(el=>{
-  el.addEventListener('click',()=>selectBusiness(el.dataset.id));
- });
+ document.querySelectorAll('.profile-item').forEach(el=>
+  el.addEventListener('click',()=>selectBusiness(el.dataset.id))
+ );
 }
 
 function renderAnalytics(){
@@ -918,8 +735,7 @@ function renderAnalytics(){
     <div class="progress">
      <span style="width:${p}%"></span>
     </div>
-   </div>
-  `;
+   </div>`;
  }).join('');
 
  const cats={};
@@ -934,10 +750,11 @@ function renderAnalytics(){
   ?Object.entries(cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
     <div class="chartbar">
      <label title="${esc(k)}">${esc(k)}</label>
-     <div class="track"><span style="width:${v/max*100}%"></span></div>
+     <div class="track">
+      <span style="width:${v/max*100}%"></span>
+     </div>
      <b>${v}</b>
-    </div>
-   `).join('')
+    </div>`).join('')
   :'<div class="empty">Add records to view category distribution.</div>';
 
  renderSelectedAudit();
@@ -959,32 +776,37 @@ function renderSelectedAudit(){
  $('auditDetail').innerHTML=`
   <div class="audit-card">
    <h3>${esc(r.name)}</h3>
+
    <div class="audit-line">
     <span>Category / area</span>
     <b>${esc(r.category)} · ${esc(r.town||r.region||'Not set')}</b>
    </div>
+
    <div class="audit-line">
     <span>Audit status</span>
     <b><span class="pill ${statusClass(s)}">${esc(s)}</span></b>
    </div>
+
    <div class="audit-line">
     <span>Completed checks</span>
     <b>${done} of ${CHECKS.length}</b>
    </div>
+
    <div class="audit-line">
     <span>Outstanding checks</span>
     <b>${issueCount(r)}</b>
    </div>
+
    <button class="btn primary" style="width:100%;margin-top:9px" id="openAuditFromDetail">
     <i class="fa-solid fa-clipboard-check"></i> Open checklist
    </button>
   </div>
+
   <div class="recommendation">
    ${issueCount(r)===0
     ?'All listed audit checks have been marked complete. Continue the monthly review.'
     :`Review the ${issueCount(r)} outstanding checklist item(s). Confirm each link or detail directly on the live business profile before marking it complete.`}
-  </div>
- `;
+  </div>`;
 
  $('openAuditFromDetail').onclick=()=>openAudit(r.id);
 }
@@ -1006,7 +828,9 @@ function selectBusiness(id){
  const r=records.find(x=>x.id===id);
 
  if(r){
+
   const p=coords(r);
+
   map.setView(p,Math.max(map.getZoom(),13));
 
   const idx=records.findIndex(x=>x.id===id);
@@ -1019,9 +843,8 @@ window.selectBusiness=selectBusiness;
 
 function clearForm(){
 
- ['bizName','bizTown','bizPhone','bizUrl','bizLat','bizLon'].forEach(id=>{
-  $(id).value='';
- });
+ ['bizName','bizTown','bizPhone','bizUrl','bizLat','bizLon']
+  .forEach(id=>$(id).value='');
 
  $('bizCategory').value='Restaurant';
  $('bizRegion').value='';
@@ -1076,24 +899,24 @@ function openAudit(id){
  $('modalBody').innerHTML=`
   <p style="font-size:10px;color:#637786;line-height:1.5;margin-top:0">
    Open the business profile on Google Search or Maps, test each item, then tick only what you have personally verified.
-  </p>
- `+
- CHECKS.map(c=>`
-  <label class="checkrow" style="padding:8px 0;border-bottom:1px solid #f0f3f5">
-   <input type="checkbox" data-check="${c[0]}" ${r.checks&&r.checks[c[0]]?'checked':''}>
-   <span>${esc(c[1])}</span>
-  </label>
- `).join('')+
- `
+  </p>`
+  +
+  CHECKS.map(c=>`
+   <label class="checkrow" style="padding:8px 0;border-bottom:1px solid #f0f3f5">
+    <input type="checkbox" data-check="${c[0]}" ${r.checks&&r.checks[c[0]]?'checked':''}>
+    <span>${esc(c[1])}</span>
+   </label>`).join('')
+  +
+  `
   <div class="field" style="margin-top:12px">
    <label>LAST REVIEWED</label>
    <input id="auditDate" type="date" value="${esc(r.reviewed||new Date().toISOString().slice(0,10))}">
   </div>
+
   <div class="field">
    <label>AUDIT NOTES</label>
    <textarea id="auditNotes" placeholder="Record broken links, incorrect details or follow-up actions...">${esc(r.notes||'')}</textarea>
-  </div>
- `;
+  </div>`;
 
  $('auditModal').classList.add('show');
 }
@@ -1150,6 +973,10 @@ function deleteSelected(){
  toast('Record deleted.');
 }
 
+/* =========================================================
+   CSV IMPORT AND EXPORT
+   ========================================================= */
+
 function csvEscape(v){
  return '"'+String(v??'').replace(/"/g,'""')+'"';
 }
@@ -1164,7 +991,7 @@ function exportCSV(){
 
  const lines=[cols.join(',')];
 
- records.forEach(r=>{
+ records.forEach(r=>
   lines.push(
    cols.map(k=>
     csvEscape(
@@ -1175,8 +1002,8 @@ function exportCSV(){
        :r[k]
     )
    ).join(',')
-  );
- });
+  )
+ );
 
  download(
   lines.join('\n'),
@@ -1269,9 +1096,9 @@ function importCSV(file){
 
     const checks={};
 
-    CHECKS.forEach(c=>{
-     checks[c[0]]=['true','1','yes','y'].includes(get(c[0]).toLowerCase());
-    });
+    CHECKS.forEach(c=>
+     checks[c[0]]=['true','1','yes','y'].includes(get(c[0]).toLowerCase())
+    );
 
     records.push({
      id:uid(),
@@ -1299,18 +1126,22 @@ function importCSV(file){
   }catch(e){
 
    toast('Could not read this CSV. Check its column headings.');
-
   }
  };
 
  reader.readAsText(file);
 }
 
+/* =========================================================
+   ILLUSTRATIVE DEMO RECORDS
+   ========================================================= */
+
 function demo(){
 
  if(records.length&&!confirm('Add illustrative demo records to the current register?'))return;
 
  const examples=[
+
   {
    name:'Demo Restaurant – Kololi',
    category:'Restaurant',
@@ -1319,6 +1150,7 @@ function demo(){
    lat:13.4462,
    lon:-16.7185
   },
+
   {
    name:'Demo Guesthouse – Kotu',
    category:'Hotel / Guesthouse',
@@ -1327,6 +1159,7 @@ function demo(){
    lat:13.4568,
    lon:-16.7041
   },
+
   {
    name:'Demo Retail Shop – Banjul',
    category:'Retail / Supermarket',
@@ -1335,6 +1168,7 @@ function demo(){
    lat:13.4549,
    lon:-16.5790
   },
+
   {
    name:'Demo Pharmacy – Brikama',
    category:'Pharmacy / Health',
@@ -1343,6 +1177,7 @@ function demo(){
    lat:13.2714,
    lon:-16.6494
   },
+
   {
    name:'Demo Tourism Service – Bakau',
    category:'Tourism / Leisure',
@@ -1357,9 +1192,9 @@ function demo(){
 
   const checks={};
 
-  CHECKS.forEach((c,j)=>{
-   checks[c[0]]=i===0?j<7:i===1?j<4:i===2?j<2:false;
-  });
+  CHECKS.forEach((c,j)=>
+   checks[c[0]]=i===0?j<7:i===1?j<4:i===2?j<2:false
+  );
 
   records.push({
    ...x,
@@ -1369,7 +1204,6 @@ function demo(){
    checks,
    notes:'Illustrative demo data only.'
   });
-
  });
 
  save();
@@ -1378,28 +1212,26 @@ function demo(){
  toast('Illustrative demo records loaded. Not real business listings.');
 }
 
+/* =========================================================
+   BASEMAP SWITCHING AND BUTTON EVENTS
+   ========================================================= */
+
 function setBasemap(layer,button){
 
  if(activeLayer)map.removeLayer(activeLayer);
 
  activeLayer=layer.addTo(map);
 
- document.querySelectorAll('.map-actions button').forEach(b=>{
-  b.classList.remove('active');
- });
-
- button.classList.add('active');
+ $('streetBtn').classList.toggle('active',button.id==='streetBtn');
+ $('satBtn').classList.toggle('active',button.id==='satBtn');
 }
-
-/* EVENT LISTENERS */
 
 $('saveBizBtn').addEventListener('click',addBusiness);
 $('clearFormBtn').addEventListener('click',clearForm);
 $('addTopBtn').addEventListener('click',()=>$('bizName').focus());
 
-['searchInput','regionFilter','categoryFilter','statusFilter'].forEach(id=>{
- $(id).addEventListener('input',renderList);
-});
+['searchInput','regionFilter','categoryFilter','statusFilter']
+ .forEach(id=>$(id).addEventListener('input',renderList));
 
 $('closeModal').onclick=closeAudit;
 $('cancelAuditBtn').onclick=closeAudit;
@@ -1427,34 +1259,42 @@ $('fitBtn').onclick=()=>{
 
   map.fitBounds(group.getBounds().pad(.18),{maxZoom:14});
 
- }else if(boundaryLayer&&boundaryLayer.getBounds().isValid()){
+ }else if(
+  ADMIN_LEVELS.lga.layer&&
+  ADMIN_LEVELS.lga.layer.getBounds().isValid()
+ ){
 
-  map.fitBounds(boundaryLayer.getBounds(),{padding:[24,24]});
+  map.fitBounds(
+   ADMIN_LEVELS.lga.layer.getBounds(),
+   {padding:[24,24]}
+  );
 
  }else{
 
   map.setView([13.42,-15.65],8);
-
  }
 };
 
-$('boundaryBtn').onclick=toggleBoundary;
+$('lgaBtn').onclick=()=>toggleAdminBoundary('lga');
+$('districtBtn').onclick=()=>toggleAdminBoundary('district');
+$('wardBtn').onclick=()=>toggleAdminBoundary('ward');
 
 $('resetMonthly').onclick=()=>{
 
- document.querySelectorAll('.global-check').forEach(c=>{
-  c.checked=false;
- });
+ document.querySelectorAll('.global-check').forEach(c=>c.checked=false);
 
  toast('Monthly reminder checklist reset.');
 };
 
-/* START APPLICATION */
+/* =========================================================
+   START APPLICATION
+   ========================================================= */
 
 load();
 initMap();
 render();
-loadGambiaBoundary();
+
+loadAdministrativeBoundaries();
 
 if(records.length){
  selectBusiness(records[0].id);
